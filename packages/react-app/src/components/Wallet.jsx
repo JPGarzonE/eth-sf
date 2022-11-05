@@ -136,9 +136,14 @@ export default function Wallet(props) {
     );
   } else if (pk) {
     const pk = localStorage.getItem("metaPrivateKey");
+    console.log("LOCAL STORAGE")
+    console.log(localStorage)
     const wallet = new ethers.Wallet(pk);
 
     if (wallet.address !== selectedAddress) {
+      const currentPrivateKey = window.localStorage.getItem("metaPrivateKey");
+      console.log('PKKKKKK')
+      console.log(currentPrivateKey)
       display = (
         <div>
           <b>*injected account*, private key unknown</b>
