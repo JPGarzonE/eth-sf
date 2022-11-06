@@ -1,5 +1,5 @@
 import { Button, Col, Menu, Row } from "antd";
-
+import * as secp from '@noble/secp256k1';
 import "antd/dist/antd.css";
 import {
   useBalance,
@@ -12,7 +12,7 @@ import {
 import { useExchangeEthPrice } from "eth-hooks/dapps/dex";
 import React, { useCallback, useEffect, useState } from "react";
 import { Link, Route, Switch, useLocation } from "react-router-dom";
-import {add} from "../src/helpers/stealthAddress"
+import {generatePublicKey,generateRandomPrivateKey,fromHexToBytes,fromHexToPoint, mutltiplication} from "../src/helpers/stealthAddress"
 import "./App.css";
 import {
   Account,
@@ -127,10 +127,30 @@ function App(props) {
       if (userSigner) {
         const newAddress = await userSigner.getAddress();
         // const privkey = await userSigner.provider()
-        const number =await  add(1,2);
-        console.log('FUCKING TEST =>>>>>>',number);
-        console.log(newAddress);
-        console.log('PKKKKK MAINjk endesfgk mefgsobmv', window.localStorage.metaPrivateKey)
+
+        //FIRST STEP GENERATE S Using a private key 
+        const pk=window.localStorage.metaPrivateKey
+        console.log('PKKKKK SENDER=>>>',pk)
+        const formatPrivKey = fromHexToBytes(pk);
+        const S =await  generatePublicKey(formatPrivKey);
+        console.log(' Secret =>>>>>>',S);
+
+        //Second Step  Generate Public Key for the receipient 
+        let pkRecipient = await generateRandomPrivateKey();
+        console.log('PKKKKK RECIPIENT=>>>',pkRecipient)
+        let test=[4, 122, 158, 68, 177, 174, 123, 229, 139, 21, 116, 61, 34, 160, 104, 213, 1, 43, 166, 241, 152, 50, 200, 95, 43, 5, 171, 245, 65, 23, 217, 4, 104, 62, 8, 121, 204, 254, 24, 0, 104, 246, 177, 88, 0, 134, 91, 42, 64, 46, 99, 179, 192, 81, 225, 148, 230, 121, 131, 180, 130, 173, 163, 55, 104]
+        let P= await  generatePublicKey(pkRecipient);
+        console.log('public KEY  RECIPIENT  =>>>>>>',P);
+
+        // Third Step  P + G * hash (Q)
+        //Q = S * PublicKeyRecipient
+        //Turn P 
+        let pointPk= fromHexToPoint(S);
+        console.log("POINTTTT=>", pointPk)
+        console.log("SECREEETTT=>",S)
+        let test2 = secp.utils.bytesToHex(pkRecipient)
+        let Q= pointPk.multiply(parseInt(test2))
+        console.log("Q=>", Q)
         setAddress(newAddress);
       }
     }
