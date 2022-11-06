@@ -20,7 +20,11 @@ contract YourContract {
       console.log(msg.sender,"set purpose to",purpose);
       emit SetPurpose(msg.sender, purpose);
   }
+  function donate ( address stealthRecipient, uint sharedSecretX , uint sharedSecretY) public payable{
+    (bool sent,)=stealthRecipient.call{value:msg.value} ("");
+    // emit Annoucement 
 
+  }
   // to support receiving ETH by default
   receive() external payable {}
   fallback() external payable {}

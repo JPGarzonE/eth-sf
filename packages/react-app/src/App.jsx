@@ -290,10 +290,16 @@ function App(props) {
         let publicKeyRecipientPoint =await fromHexToPoint(P);
         console.log("Public Key RECIPIENT POINT =>", publicKeyRecipientPoint);
        let publicKeyQPoint=await fromHexToPoint(publicKeyQ)
-        let StealthAdress= publicKeyRecipientPoint.add(publicKeyQPoint)
-        console.log("Stealth Adress=>", StealthAdress);
+        let StealthAdressPoint= publicKeyRecipientPoint.add(publicKeyQPoint)
+        console.log("Stealth Adress Point =>", StealthAdressPoint);
+        let StealthAdressString = StealthAdressPoint.toHex();
+        console.log("Stealth Adres STRINGs=>", StealthAdressString);
+        let StealthAdressHash= await hash(StealthAdressString).slice(-20)
+        let  string = secp.utils.bytesToHex(StealthAdressHash)
+        console.log("Stealth AdresS HASH=>", string.padStart(42,'0x'));
+    
         //Pribvate Key from the recipient + Q 
-        let St
+        let wallet= ethers.Wallet.fromEncryptedJson
 
         // ethers.Wallet(Ste)
   }
@@ -355,9 +361,9 @@ function App(props) {
         {/* <Menu.Item key="/hints">
           <Link to="/hints">Hints</Link>
         </Menu.Item> */}
-        {/* <Menu.Item key="/exampleui">
-          <Link to="/exampleui">ExampleUI</Link>
-        </Menu.Item> */}
+        <Menu.Item key="/exampleui">
+          <Link to="/exampleui">Project creation</Link>
+        </Menu.Item>
         {/* <Menu.Item key="/mainnetdai">
           <Link to="/mainnetdai">Mainnet DAI</Link>
         </Menu.Item> */}
@@ -388,14 +394,14 @@ function App(props) {
             contractConfig={contractConfig}
           />
         </Route>
-        <Route path="/hints">
+        {/* <Route path="/hints">
           <Hints
             address={address}
             yourLocalBalance={yourLocalBalance}
             mainnetProvider={mainnetProvider}
             price={price}
           />
-        </Route>
+        </Route> */}
         <Route path="/exampleui">
           <ExampleUI
             address={address}
@@ -445,7 +451,7 @@ function App(props) {
       <ThemeSwitch />
 
       {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
-      <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10 }}>
+      {/* <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10 }}>
         <Row align="middle" gutter={[4, 4]}>
           <Col span={8}>
             <Ramp price={price} address={address} networks={NETWORKS} />
@@ -473,7 +479,6 @@ function App(props) {
         <Row align="middle" gutter={[4, 4]}>
           <Col span={24}>
             {
-              /*  if the local provider has a signer, let's show the faucet:  */
               faucetAvailable ? (
                 <Faucet localProvider={localProvider} price={price} ensProvider={mainnetProvider} />
               ) : (
@@ -482,7 +487,7 @@ function App(props) {
             }
           </Col>
         </Row>
-      </div>
+      </div> */}
     </div>
   );
 }
