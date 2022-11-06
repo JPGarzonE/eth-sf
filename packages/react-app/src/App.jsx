@@ -12,7 +12,7 @@ import {
 import { useExchangeEthPrice } from "eth-hooks/dapps/dex";
 import React, { useCallback, useEffect, useState } from "react";
 import { Link, Route, Switch, useLocation } from "react-router-dom";
-import {generatePublicKey,generateRandomPrivateKey,fromHexToBytes,fromHexToPoint, mutltiplication} from "../src/helpers/stealthAddress"
+import {generatePublicKey,generateRandomPrivateKey,fromHexToBytes,fromHexToPoint, mutltiplication, hash} from "../src/helpers/stealthAddress"
 import "./App.css";
 import {
   Account,
@@ -259,26 +259,43 @@ function App(props) {
         //FIRST STEP GENERATE S Using a private key 
         const pk= window.localStorage.metaPrivateKey
         console.log('PKKKKK SENDER=>>>',pk)
-        const formatPrivKey = fromHexToBytes(pk);
+        const formatPrivKey = await fromHexToBytes(pk);
         const S =await  generatePublicKey(formatPrivKey);
         console.log(' Secret =>>>>>>',S);
 
         //Second Step  Generate Public Key for the receipient 
-        let pkRecipient = await generateRandomPrivateKey();
-        console.log('PKKKKK RECIPIENT=>>>',pkRecipient)
-
-        let P= await  generatePublicKey(pkRecipient);
+        let privateKeyRecipient = secp.utils.randomPrivateKey();
+        console.log('PKKKKK RECIPIENT=>>>',privateKeyRecipient)
+        let P= await  generatePublicKey(privateKeyRecipient);
         console.log('public KEY  RECIPIENT  =>>>>>>',P);
 
         // Third Step  P + G * hash (Q)
         //Q = S * PrivateKeyRecipient
+        //Q = P * s 
         //Turn P 
         let pointPk= await fromHexToPoint(S);
         console.log("POINTTTT=>", pointPk)
         console.log("SECREEETTT=>",S)
-        let test2 = await secp.utils.bytesToHex(pkRecipient)
-        let Q= await pointPk.multiply(parseInt(test2))
-        console.log("Q=>", Q)
+        let formatP=parseInt(privateKeyRecipient)
+        console.log('FORMAAATTT=> ', formatP)
+        let Q= await pointPk.multiply(formatP)
+        let Qconcanct=  Q.x.toString().concat(Q.y.toString())
+        console.log("Q ADDED =>", Qconcanct);
+
+        let Qhashed= await hash(Qconcanct);
+        console.log("HASHED =>", Qhashed);
+
+        let publicKeyQ= await generatePublicKey(Qhashed);
+        console.log("Public Key Q =>", publicKeyQ);
+        let publicKeyRecipientPoint =await fromHexToPoint(P);
+        console.log("Public Key RECIPIENT POINT =>", publicKeyRecipientPoint);
+       let publicKeyQPoint=await fromHexToPoint(publicKeyQ)
+        let StealthAdress= publicKeyRecipientPoint.add(publicKeyQPoint)
+        console.log("Stealth Adress=>", StealthAdress);
+        //Pribvate Key from the recipient + Q 
+        let St
+
+        // ethers.Wallet(Ste)
   }
   return (
     <div className="App">

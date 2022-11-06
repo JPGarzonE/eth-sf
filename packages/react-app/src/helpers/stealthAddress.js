@@ -1,6 +1,7 @@
 import * as secp from '@noble/secp256k1';
+import * as keccak from 'keccak256'
 
-//Function to generate a publick key from a private key
+//enerate a publick key from a private key
 export async function  generatePublicKey(privKey){
     return secp.getPublicKey(privKey);
 }
@@ -17,4 +18,7 @@ export function fromHexToBytes (number){
 }
 export  function  fromHexToPoint(hex){
     return secp.Point.fromHex(hex)
+}
+export function hash (string){
+    return keccak(string)
 }
