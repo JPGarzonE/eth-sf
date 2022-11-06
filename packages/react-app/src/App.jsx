@@ -126,31 +126,6 @@ function App(props) {
     async function getAddress() {
       if (userSigner) {
         const newAddress = await userSigner.getAddress();
-        // const privkey = await userSigner.provider()
-
-        //FIRST STEP GENERATE S Using a private key 
-        const pk=window.localStorage.metaPrivateKey
-        console.log('PKKKKK SENDER=>>>',pk)
-        const formatPrivKey = fromHexToBytes(pk);
-        const S =await  generatePublicKey(formatPrivKey);
-        console.log(' Secret =>>>>>>',S);
-
-        //Second Step  Generate Public Key for the receipient 
-        let pkRecipient = await generateRandomPrivateKey();
-        console.log('PKKKKK RECIPIENT=>>>',pkRecipient)
-        let test=[4, 122, 158, 68, 177, 174, 123, 229, 139, 21, 116, 61, 34, 160, 104, 213, 1, 43, 166, 241, 152, 50, 200, 95, 43, 5, 171, 245, 65, 23, 217, 4, 104, 62, 8, 121, 204, 254, 24, 0, 104, 246, 177, 88, 0, 134, 91, 42, 64, 46, 99, 179, 192, 81, 225, 148, 230, 121, 131, 180, 130, 173, 163, 55, 104]
-        let P= await  generatePublicKey(pkRecipient);
-        console.log('public KEY  RECIPIENT  =>>>>>>',P);
-
-        // Third Step  P + G * hash (Q)
-        //Q = S * PublicKeyRecipient
-        //Turn P 
-        let pointPk= fromHexToPoint(S);
-        console.log("POINTTTT=>", pointPk)
-        console.log("SECREEETTT=>",S)
-        let test2 = secp.utils.bytesToHex(pkRecipient)
-        let Q= pointPk.multiply(parseInt(test2))
-        console.log("Q=>", Q)
         setAddress(newAddress);
       }
     }
@@ -279,7 +254,32 @@ function App(props) {
   }, [loadWeb3Modal]);
 
   const faucetAvailable = localProvider && localProvider.connection && targetNetwork.name.indexOf("local") !== -1;
+  const registerFunction   = async () => {
+ // const privkey = await userSigner.provider()
+        //FIRST STEP GENERATE S Using a private key 
+        const pk= window.localStorage.metaPrivateKey
+        console.log('PKKKKK SENDER=>>>',pk)
+        const formatPrivKey = fromHexToBytes(pk);
+        const S =await  generatePublicKey(formatPrivKey);
+        console.log(' Secret =>>>>>>',S);
 
+        //Second Step  Generate Public Key for the receipient 
+        let pkRecipient = await generateRandomPrivateKey();
+        console.log('PKKKKK RECIPIENT=>>>',pkRecipient)
+
+        let P= await  generatePublicKey(pkRecipient);
+        console.log('public KEY  RECIPIENT  =>>>>>>',P);
+
+        // Third Step  P + G * hash (Q)
+        //Q = S * PrivateKeyRecipient
+        //Turn P 
+        let pointPk= await fromHexToPoint(S);
+        console.log("POINTTTT=>", pointPk)
+        console.log("SECREEETTT=>",S)
+        let test2 = await secp.utils.bytesToHex(pkRecipient)
+        let Q= await pointPk.multiply(parseInt(test2))
+        console.log("Q=>", Q)
+  }
   return (
     <div className="App">
       {/* ✏️ Edit the header and change the title to your project name */}
@@ -314,6 +314,12 @@ function App(props) {
       {yourLocalBalance.lte(ethers.BigNumber.from("0")) && (
         <FaucetHint localProvider={localProvider} targetNetwork={targetNetwork} address={address} />
       )}
+       <Button
+          type="primary"
+          onClick={registerFunction}
+        >
+          Register 🚀
+        </Button>
       <NetworkDisplay
         NETWORKCHECK={NETWORKCHECK}
         localChainId={localChainId}

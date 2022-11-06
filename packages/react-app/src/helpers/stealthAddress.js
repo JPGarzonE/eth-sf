@@ -15,6 +15,6 @@ export function fromHexToBytes (number){
     const formatNumber=secp.utils.hexToBytes(number.slice(2));
     return formatNumber
 }
-export function fromHexToPoint(hex){
+export  function  fromHexToPoint(hex){
     return secp.Point.fromHex(hex)
 }
